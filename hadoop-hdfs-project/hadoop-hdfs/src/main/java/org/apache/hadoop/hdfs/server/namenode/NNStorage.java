@@ -60,6 +60,7 @@ import com.google.common.collect.Lists;
 /**
  * NNStorage is responsible for management of the StorageDirectories used by
  * the NameNode.
+ * NNStorage负责管理NameNode使用的StorageDirectories。
  */
 @InterfaceAudience.Private
 public class NNStorage extends Storage implements Closeable,

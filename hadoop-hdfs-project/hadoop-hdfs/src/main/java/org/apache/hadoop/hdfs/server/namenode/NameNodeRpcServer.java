@@ -188,6 +188,10 @@ import com.google.protobuf.BlockingService;
 
 /**
  * This class is responsible for handling all of the RPC calls to the NameNode.
+ * 这个类负责处理所有针对NameNode的RPC调用。
+ * 它提供了与客户端之间的通信接口，处理诸如文件操作、元数据管理、块管理等功能的请求。
+ * 通过这个类，客户端可以与NameNode进行交互并执行各种操作。
+ *
  * It is created, started, and stopped by {@link NameNode}.
  */
 class NameNodeRpcServer implements NamenodeProtocols {

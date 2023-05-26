@@ -46,10 +46,12 @@ import com.google.common.collect.Sets;
  * The NNStorageRetentionManager is responsible for inspecting the storage
  * directories of the NN and enforcing a retention policy on checkpoints
  * and edit logs.
+ * NNStorageRetentionManager负责检查NN的存储目录，并对检查点和编辑日志执行保留策略。
  * 
  * It delegates the actual removal of files to a StoragePurger
  * implementation, which might delete the files or instead copy them to
  * a filer or HDFS for later analysis.
+ * 它将实际的文件删除操作委托给StoragePurger的实现，该实现可以删除文件，也可以将文件复制到filer或HDFS以供以后分析。
  */
 public class NNStorageRetentionManager {
   

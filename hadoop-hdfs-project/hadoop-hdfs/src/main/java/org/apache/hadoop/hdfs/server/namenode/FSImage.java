@@ -79,6 +79,7 @@ import com.google.common.collect.Lists;
 
 /**
  * FSImage handles checkpointing and logging of the namespace edits.
+ * FSImage负责处理命名空间的检查点和日志记录。
  * 
  */
 @InterfaceAudience.Private
@@ -123,8 +124,10 @@ public class FSImage implements Closeable {
 
   /**
    * Construct the FSImage. Set the default checkpoint directories.
+   * 构建FSImage。设置默认的检查点目录。
    *
    * Setup storage and initialize the edit log.
+   * 设置存储并初始化编辑日志。
    *
    * @param conf Configuration
    * @param imageDirs Directories the image can be stored in.
@@ -591,7 +594,9 @@ public class FSImage implements Closeable {
   /**
    * Choose latest image from one of the directories,
    * load it and merge with the edits.
-   * 
+   * 从其中一个目录中选择最新的镜像，
+   * 加载它并与编辑日志合并。
+   *
    * Saving and loading fsimage should never trigger symlink resolution. 
    * The paths that are persisted do not have *intermediate* symlinks 
    * because intermediate symlinks are resolved at the time files, 
@@ -599,6 +604,9 @@ public class FSImage implements Closeable {
    * loading or saving fsimage should therefore only see symlinks as 
    * the final path component, and the functions called below do not
    * resolve symlinks that are the final path component.
+   * 保存和加载fsimage时不应触发符号链接解析。
+   * 持久化的路径不包含*中间*符号链接，因为在创建文件、目录和符号链接时会解析中间符号链接。
+   * 因此，在加载或保存fsimage时访问的所有路径只会将符号链接视为最终路径组件，并且下面调用的函数不会解析最终路径组件中的符号链接。
    *
    * @return whether the image should be saved
    * @throws IOException
@@ -980,6 +988,7 @@ public class FSImage implements Closeable {
 
   /**
    * Save the contents of the FS image to the file.
+   * fs image内容保存到文件
    */
   void saveFSImage(SaveNamespaceContext context, StorageDirectory sd,
       NameNodeFile dstType) throws IOException {
@@ -1017,13 +1026,17 @@ public class FSImage implements Closeable {
   /**
    * FSImageSaver is being run in a separate thread when saving
    * FSImage. There is one thread per each copy of the image.
+   * 在保存FSImage时，FSImageSaver在单独的线程中运行。每个image副本都有一个线程。
    *
    * FSImageSaver assumes that it was launched from a thread that holds
    * FSNamesystem lock and waits for the execution of FSImageSaver thread
    * to finish.
+   * FSImageSaver假设它是从持有FSNamesystem锁的线程启动的，并等待FSImageSaver线程执行完成。
+   *
    * This way we are guaranteed that the namespace is not being updated
    * while multiple instances of FSImageSaver are traversing it
    * and writing it out.
+   * 这样我们可以确保在多个FSImageSaver实例遍历并写出命名空间时，命名空间不会被更新。
    */
   private class FSImageSaver implements Runnable {
     private final SaveNamespaceContext context;
@@ -1089,6 +1102,7 @@ public class FSImage implements Closeable {
   /**
    * Save the contents of the FS image to a new image file in each of the
    * current storage directories.
+   * 将FS image 的内容保存到当前每个存储目录中的新image文件中。
    */
   public synchronized void saveNamespace(FSNamesystem source, NameNodeFile nnf,
       Canceler canceler) throws IOException {

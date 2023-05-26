@@ -88,12 +88,18 @@ import javax.management.ObjectName;
  * The Secondary is responsible for supporting periodic checkpoints 
  * of the HDFS metadata. The current design allows only one Secondary
  * NameNode per HDFs cluster.
+ * 辅助NameNode（Secondary NameNode）是主NameNode的辅助节点。
+ * 辅助节点负责支持对HDFS元数据进行定期检查点（checkpoint）的操作。
+ * 当前设计每个HDFS集群只允许存在一个辅助NameNode。
  *
  * The Secondary NameNode is a daemon that periodically wakes
  * up (determined by the schedule specified in the configuration),
  * triggers a periodic checkpoint and then goes back to sleep.
  * The Secondary NameNode uses the NamenodeProtocol to talk to the
  * primary NameNode.
+ * 辅助NameNode（Secondary NameNode）是一个守护进程，定期唤醒（根据配置中指定的计划），
+ * 触发定期检查点操作，然后再进入休眠状态。
+ * 辅助NameNode使用NamenodeProtocol与主NameNode进行通信。
  *
  **********************************************************/
 @InterfaceAudience.Private
@@ -207,6 +213,7 @@ public class SecondaryNameNode implements Runnable,
   
   /**
    * Initialize SecondaryNameNode.
+   * 初始化
    */
   private void initialize(final Configuration conf,
       CommandLineOpts commandLineOpts) throws IOException {
@@ -364,7 +371,7 @@ public class SecondaryNameNode implements Runnable,
       });
   }
   //
-  // The main work loop
+  // The main work loop 主要工作
   //
   public void doWork() {
     //
@@ -385,6 +392,7 @@ public class SecondaryNameNode implements Runnable,
       }
       try {
         // We may have lost our ticket since last checkpoint, log in again, just in case
+        // 我们可能在上次检查点后丢失了我们的凭据，为了安全起见，请重新登录。
         if(UserGroupInformation.isSecurityEnabled())
           UserGroupInformation.getCurrentUser().checkTGTAndReloginFromKeytab();
         
@@ -416,6 +424,7 @@ public class SecondaryNameNode implements Runnable,
   /**
    * Download <code>fsimage</code> and <code>edits</code>
    * files from the name-node.
+   * 从NameNode下载`fsimage`和`edits`文件。
    * @return true if a new image has been downloaded and needs to be loaded
    * @throws IOException
    */
@@ -498,7 +507,7 @@ public class SecondaryNameNode implements Runnable,
   }
 
   /**
-   * Create a new checkpoint
+   * Create a new checkpoint 创建新的检查点
    * @return if the image is fetched from primary or not
    */
   @VisibleForTesting
@@ -553,7 +562,7 @@ public class SecondaryNameNode implements Runnable,
 
     
     //
-    // Upload the new image into the NameNode. Then tell the Namenode
+    // Upload the new image iento the NameNode. Then tell the Namenode
     // to make this new uploaded image as the most current image.
     //
     long txid = checkpointImage.getLastAppliedTxId();

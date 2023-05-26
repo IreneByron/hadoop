@@ -136,19 +136,36 @@ import static org.apache.hadoop.util.ToolRunner.confirmPrompt;
  * "inode table" for the Hadoop DFS.  There is a single NameNode
  * running in any DFS deployment.  (Well, except when there
  * is a second backup/failover NameNode, or when using federated NameNodes.)
+ * NameNode在Hadoop分布式文件系统（HDFS）中充当 目录命名空间管理器 和 "Inode表" 的角色。
+ * 在DFS部署中只有一个NameNode运行。（除非有第二个备份/故障转移NameNode，或者使用联合NameNode。）
  *
  * The NameNode controls two critical tables:
  *   1)  filename->blocksequence (namespace)
  *   2)  block->machinelist ("inodes")
  *
+ *  NameNode控制着两个关键的表：
+ *    1)  文件名->块序列（命名空间）
+ *    2)  块->机器列表（"inodes"）
+ *
  * The first table is stored on disk and is very precious.
  * The second table is rebuilt every time the NameNode comes up.
+ * 第一个表存储在磁盘上，非常重要。
+ *    文件名到块序列的映射表，也称为命名空间表。
+ *    它将文件名与相应的数据块序列关联起来，用于管理Hadoop分布式文件系统（HDFS）中的目录和文件结构。
+ * 第二个表在每次NameNode启动时都会被重建。
+ *    块到机器列表的映射表，也称为inode表。
+ *    它将每个数据块与存储该数据块的机器列表关联起来。
+ *    这个表在每次NameNode启动时都会被重新构建，因为它存储在内存中，而不是持久化到磁盘上。
+ *
  *
  * 'NameNode' refers to both this class as well as the 'NameNode server'.
  * The 'FSNamesystem' class actually performs most of the filesystem
  * management.  The majority of the 'NameNode' class itself is concerned
  * with exposing the IPC interface and the HTTP server to the outside world,
  * plus some configuration management.
+ * 'NameNode'既指代这个类，也指代'NameNode服务器'。
+ *  'FSNamesystem'类实际上执行大部分的文件系统管理工作。
+ *  'NameNode'类本身的大部分内容都与向外部提供IPC接口和HTTP服务器以及一些配置管理有关。
  *
  * NameNode implements the
  * {@link org.apache.hadoop.hdfs.protocol.ClientProtocol} interface, which
@@ -157,16 +174,25 @@ import static org.apache.hadoop.util.ToolRunner.confirmPrompt;
  * direct use by authors of DFS client code.  End-users should instead use the
  * {@link org.apache.hadoop.fs.FileSystem} class.
  *
+ * NameNode实现了`org.apache.hadoop.hdfs.protocol.ClientProtocol`接口，该接口允许客户端请求DFS服务。
+ * `org.apache.hadoop.hdfs.protocol.ClientProtocol`接口并不是为DFS客户端代码的作者直接使用而设计的。
+ * 最终用户应该使用`org.apache.hadoop.fs.FileSystem`类来代替。
+ *
  * NameNode also implements the
  * {@link org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol} interface,
  * used by DataNodes that actually store DFS data blocks.  These
  * methods are invoked repeatedly and automatically by all the
  * DataNodes in a DFS deployment.
+ * NameNode还实现了`org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol`接口，
+ * 该接口被实际存储DFS数据块的DataNode使用。
+ * 这些方法会在DFS部署中的所有DataNode上被重复自动地调用。
  *
  * NameNode also implements the
  * {@link org.apache.hadoop.hdfs.server.protocol.NamenodeProtocol} interface,
  * used by secondary namenodes or rebalancing processes to get partial
  * NameNode state, for example partial blocksMap etc.
+ * NameNode还实现了`org.apache.hadoop.hdfs.server.protocol.NamenodeProtocol`接口，
+ * 该接口被secondary NameNode或数据均衡过程用于获取部分NameNode状态，例如部分blocksMap等。
  **********************************************************/
 @InterfaceAudience.Private
 public class NameNode implements NameNodeStatusMXBean {
@@ -178,15 +204,15 @@ public class NameNode implements NameNodeStatusMXBean {
    * Categories of operations supported by the namenode.
    */
   public static enum OperationCategory {
-    /** Operations that are state agnostic */
+    /** Operations that are state agnostic 不涉及状态的操作*/
     UNCHECKED,
-    /** Read operation that does not change the namespace state */
+    /** Read operation that does not change the namespace state 不改变命名空间状态的读取操作 */
     READ,
-    /** Write operation that changes the namespace state */
+    /** Write operation that changes the namespace state 改变命名空间状态的写操作*/
     WRITE,
-    /** Operations related to checkpointing */
+    /** Operations related to checkpointing 与检查点相关的操作*/
     CHECKPOINT,
-    /** Operations related to {@link JournalProtocol} */
+    /** Operations related to {@link JournalProtocol} 与JournalProtocol相关的操作*/
     JOURNAL
   }
   
@@ -201,13 +227,20 @@ public class NameNode implements NameNodeStatusMXBean {
    * with nameserviceId and namenodeId in the configuration. for example,
    * "dfs.namenode.rpc-address.nameservice1.namenode1"</li>
    * </ol>
-   * 
+   *
+   * HDFS配置可以具有三种类型的参数：
+   *    * 所有名称服务 name services 都通用的参数。
+   *    * 特定于名称服务的参数。这些键在配置中以 nameserviceId 作为后缀。例如，"dfs.namenode.rpc-address.nameservice1"。
+   *    * 特定于单个名称节点的参数。这些键在配置中以 nameserviceId 和 namenodeId 作为后缀。例如，"dfs.namenode.rpc-address.nameservice1.namenode1"。
+   *
    * In the latter cases, operators may specify the configuration without
    * any suffix, with a nameservice suffix, or with a nameservice and namenode
    * suffix. The more specific suffix will take precedence.
+   * 在上述情况下，操作员可以在配置中指定不带任何后缀、带有nameservice后缀或同时带有nameservice和namenode后缀。更具体的后缀将优先生效。
    * 
    * These keys are specific to a given namenode, and thus may be configured
    * globally, for a nameservice, or for a specific namenode within a nameservice.
+   * 这些键是针对特定的NameNode的，因此可以在全局范围、NameService范围或NameService内的特定NameNode范围内进行配置。
    */
   public static final String[] NAMENODE_SPECIFIC_KEYS = {
     DFS_NAMENODE_RPC_ADDRESS_KEY,
@@ -241,6 +274,7 @@ public class NameNode implements NameNodeStatusMXBean {
    * @see #NAMENODE_SPECIFIC_KEYS
    * These keys are specific to a nameservice, but may not be overridden
    * for a specific namenode.
+   * 这些键是针对NameService特定的，但不能在特定的NameNode上进行覆盖。
    */
   public static final String[] NAMESERVICE_SPECIFIC_KEYS = {
     DFS_HA_AUTO_FAILOVER_ENABLED_KEY
@@ -334,6 +368,7 @@ public class NameNode implements NameNodeStatusMXBean {
    * The namenode address that clients will use to access this namenode
    * or the name service. For HA configurations using logical URI, it
    * will be the logical address.
+   * 客户端用于访问该NameNode或NameService的NameNode地址。对于使用逻辑URI的高可用配置，它将是逻辑地址。
    */
   private String clientNamenodeAddress;
   
@@ -386,6 +421,7 @@ public class NameNode implements NameNodeStatusMXBean {
    * Set the namenode address that will be used by clients to access this
    * namenode or name service. This needs to be called before the config
    * is overriden.
+   * 设置 clientNamenodeAddress
    */
   public void setClientNamenodeAddress(Configuration conf) {
     String nnAddr = conf.get(FS_DEFAULT_NAME_KEY);
@@ -434,6 +470,7 @@ public class NameNode implements NameNodeStatusMXBean {
   /**
    * Set the configuration property for the service rpc address
    * to address
+   * 将服务的RPC地址配置属性设置为给定地址。
    */
   public static void setServiceAddress(Configuration conf,
                                            String address) {
@@ -617,7 +654,8 @@ public class NameNode implements NameNodeStatusMXBean {
   
   /**
    * Initialize name-node.
-   * 
+   * 初始化
+   *
    * @param conf the configuration
    */
   protected void initialize(Configuration conf) throws IOException {
@@ -668,13 +706,14 @@ public class NameNode implements NameNodeStatusMXBean {
   /**
    * Create the RPC server implementation. Used as an extension point for the
    * BackupNode.
+   * 创建RPC服务器实现。作为BackupNode的扩展点使用。
    */
   protected NameNodeRpcServer createRpcServer(Configuration conf)
       throws IOException {
     return new NameNodeRpcServer(conf, this);
   }
 
-  /** Start the services common to active and standby states */
+  /** Start the services common to active and standby states 启动服务 */
   private void startCommonServices(Configuration conf) throws IOException {
     namesystem.startCommonServices(conf, haContext);
     registerNNSMXBean();
@@ -683,7 +722,7 @@ public class NameNode implements NameNodeStatusMXBean {
       httpServer.setNameNodeAddress(getNameNodeAddress());
       httpServer.setFSImage(getFSImage());
     }
-    rpcServer.start();
+    rpcServer.start(); // 启动rpcServer
     plugins = conf.getInstances(DFS_NAMENODE_PLUGINS_KEY,
         ServicePlugin.class);
     for (ServicePlugin p: plugins) {
@@ -764,30 +803,33 @@ public class NameNode implements NameNodeStatusMXBean {
 
   /**
    * Start NameNode.
+   * 启动 NameNode
    * <p>
    * The name-node can be started with one of the following startup options:
+   * 可以使用以下启动选项之一来启动名称节点：
    * <ul> 
-   * <li>{@link StartupOption#REGULAR REGULAR} - normal name node startup</li>
-   * <li>{@link StartupOption#FORMAT FORMAT} - format name node</li>
-   * <li>{@link StartupOption#BACKUP BACKUP} - start backup node</li>
-   * <li>{@link StartupOption#CHECKPOINT CHECKPOINT} - start checkpoint node</li>
-   * <li>{@link StartupOption#UPGRADE UPGRADE} - start the cluster  
+   * <li>{@link StartupOption#REGULAR REGULAR} - normal name node startup</li> 正常的名称节点启动
+   * <li>{@link StartupOption#FORMAT FORMAT} - format name node</li> 格式化名称节点
+   * <li>{@link StartupOption#BACKUP BACKUP} - start backup node</li> 启动备份节点
+   * <li>{@link StartupOption#CHECKPOINT CHECKPOINT} - start checkpoint node</li> 启动检查点节点
+   * <li>{@link StartupOption#UPGRADE UPGRADE} - start the cluster  启动集群升级
    * <li>{@link StartupOption#UPGRADEONLY UPGRADEONLY} - upgrade the cluster  
-   * upgrade and create a snapshot of the current file system state</li> 
+   * upgrade and create a snapshot of the current file system state</li>  升级集群并创建当前文件系统状态的快照
    * <li>{@link StartupOption#RECOVER RECOVERY} - recover name node
-   * metadata</li>
+   * metadata</li> 恢复名称节点元数据
    * <li>{@link StartupOption#ROLLBACK ROLLBACK} - roll the  
-   *            cluster back to the previous state</li>
+   *            cluster back to the previous state</li> 将集群回滚到先前的状态
    * <li>{@link StartupOption#FINALIZE FINALIZE} - finalize 
-   *            previous upgrade</li>
-   * <li>{@link StartupOption#IMPORT IMPORT} - import checkpoint</li>
+   *            previous upgrade</li> 完成先前的升级
+   * <li>{@link StartupOption#IMPORT IMPORT} - import checkpoint</li> 导入检查点
    * </ul>
-   * The option is passed via configuration field: 
+   * The option is passed via configuration field: 选项通过配置字段传递
    * <tt>dfs.namenode.startup</tt>
    * 
    * The conf will be modified to reflect the actual ports on which 
    * the NameNode is up and running if the user passes the port as
    * <code>zero</code> in the conf.
+   * 如果用户在配置中将端口设置为0，那么配置将被修改以反映名称节点实际运行的端口。
    * 
    * @param conf  confirguration
    * @throws IOException
@@ -891,12 +933,13 @@ public class NameNode implements NameNodeStatusMXBean {
 
   /**
    * Is the cluster currently in safe mode?
+   * 当前集群是否在安全模式
    */
   public boolean isInSafeMode() {
     return namesystem.isInSafeMode();
   }
     
-  /** get FSImage */
+  /** get FSImage 获得fsimage*/
   @VisibleForTesting
   public FSImage getFSImage() {
     return namesystem.getFSImage();
@@ -945,6 +988,7 @@ public class NameNode implements NameNodeStatusMXBean {
    * Verify that configured directories exist, then
    * Interactively confirm that formatting is desired 
    * for each existing directory and format them.
+   * 验证配置的目录是否存在，然后交互式确认是否需要对每个现有目录进行格式化，并对它们进行格式化。
    * 
    * @param conf configuration to use
    * @param force if true, format regardless of whether dirs exist
@@ -1022,6 +1066,7 @@ public class NameNode implements NameNodeStatusMXBean {
 
   /**
    * Clone the supplied configuration but remove the shared edits dirs.
+   * 克隆提供的配置，但删除共享编辑目录。
    *
    * @param conf Supplies the original configuration.
    * @return Cloned configuration without the shared edit dirs.
@@ -1043,6 +1088,7 @@ public class NameNode implements NameNodeStatusMXBean {
   /**
    * Format a new shared edits dir and copy in enough edit log segments so that
    * the standby NN can start up.
+   * 格式化一个新的共享编辑目录，并复制足够的编辑日志段，以便备用的NN可以启动。
    * 
    * @param conf configuration
    * @param force format regardless of whether or not the shared edits dir exists
@@ -1398,6 +1444,7 @@ public class NameNode implements NameNodeStatusMXBean {
   /**
    * Verify that configured directories exist, then print the metadata versions
    * of the software and the image.
+   * 验证配置的目录是否存在，然后打印软件和镜像的元数据版本。
    *
    * @param conf configuration to use
    * @throws IOException

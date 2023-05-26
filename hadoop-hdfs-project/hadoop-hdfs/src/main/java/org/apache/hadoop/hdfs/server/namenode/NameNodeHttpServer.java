@@ -42,7 +42,8 @@ import org.apache.hadoop.security.SecurityUtil;
 import org.apache.hadoop.security.UserGroupInformation;
 
 /**
- * Encapsulates the HTTP server started by the NameNode. 
+ * Encapsulates the HTTP server started by the NameNode.
+ * 封装了由NameNode启动的HTTP服务器。
  */
 @InterfaceAudience.Private
 public class NameNodeHttpServer {

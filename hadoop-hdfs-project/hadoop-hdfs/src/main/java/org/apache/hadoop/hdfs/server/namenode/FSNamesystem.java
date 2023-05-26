@@ -308,6 +308,16 @@ import com.google.common.collect.Lists;
  * 3)  block --> machinelist (kept in memory, rebuilt dynamically from reports)
  * 4)  machine --> blocklist (inverted #2)
  * 5)  LRU cache of updated-heartbeat machines
+ *
+ * FSNamesystem 在DataNode上执行实际的簿记工作。
+ *
+ * 它跟踪几个重要的表格。
+ *
+ * 1) 有效的fsname --> blocklist（保存在磁盘上，记录日志）
+ * 2) 所有有效块的集合（反向关系 #1）
+ * 3) 块 --> machinelist（保存在内存中，根据报告动态重建）
+ * 4) 机器 --> blocklist（反向关系 #2）
+ * 5) 更新心跳机器的LRU缓存
  ***************************************************/
 @InterfaceAudience.Private
 @Metrics(context="dfs")

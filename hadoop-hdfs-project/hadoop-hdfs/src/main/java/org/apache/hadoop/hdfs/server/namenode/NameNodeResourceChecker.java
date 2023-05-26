@@ -44,6 +44,10 @@ import com.google.common.base.Predicate;
  * the NameNode has disk space available on all required volumes, and any volume
  * which is configured to be redundant. Volumes containing file system edits dirs
  * are added by default, and arbitrary extra volumes may be configured as well.
+ * NameNodeResourceChecker提供了一个方法"hasAvailableDiskSpace"，
+ * 当且仅当NameNode在所有必需的卷和配置为冗余的卷上都有可用的磁盘空间时，该方法将返回true。
+ * 默认情况下，已添加包含文件系统编辑目录的卷，并且还可以配置额外的卷。
+ * 该方法用于检查NameNode是否具有足够的磁盘空间来执行其功能，并确保在出现故障时具有冗余卷来保证高可用性。
  */
 @InterfaceAudience.Private
 public class NameNodeResourceChecker {

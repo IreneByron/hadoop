@@ -24,6 +24,8 @@ import org.apache.hadoop.classification.InterfaceAudience;
 /**
  * Given a set of checkable resources, this class is capable of determining
  * whether sufficient resources are available for the NN to continue operating.
+ * 给定一组可检查的资源，该类能够确定是否有足够的资源供NameNode继续运行。
+ * 它用于检查NameNode所需的各种资源，如磁盘空间、内存等，以确保系统具有足够的资源来保持正常运行。
  */
 @InterfaceAudience.Private
 final class NameNodeResourcePolicy {

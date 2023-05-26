@@ -188,6 +188,7 @@ public final class FSImageFormatProtobuf {
       }
     }
 
+    // load fsimage文件
     private void loadInternal(RandomAccessFile raFile, FileInputStream fin)
         throws IOException {
       if (!FSImageUtil.checkFileFormat(raFile)) {
