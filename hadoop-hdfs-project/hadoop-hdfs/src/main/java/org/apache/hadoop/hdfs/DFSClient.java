@@ -239,10 +239,13 @@ import com.google.common.net.InetAddresses;
  * perform basic file tasks.  It uses the ClientProtocol
  * to communicate with a NameNode daemon, and connects 
  * directly to DataNodes to read/write block data.
+ * DFSClient是用于连接Hadoop文件系统并执行基本文件操作的客户端。
+ * 它使用ClientProtocol与NameNode守护程序进行通信，并直接连接到DataNode以读取/写入块数据。
  *
  * Hadoop DFS users should obtain an instance of 
  * DistributedFileSystem, which uses DFSClient to handle
  * filesystem tasks.
+ * Hadoop DFS用户应该获取DistributedFileSystem的实例，它使用DFSClient来处理文件系统任务。
  *
  ********************************************************/
 @InterfaceAudience.Private

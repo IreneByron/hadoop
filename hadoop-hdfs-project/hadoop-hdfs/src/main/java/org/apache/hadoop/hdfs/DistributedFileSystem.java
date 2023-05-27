@@ -99,6 +99,8 @@ import com.google.common.base.Preconditions;
  * Implementation of the abstract FileSystem for the DFS system.
  * This object is the way end-user code interacts with a Hadoop
  * DistributedFileSystem.
+ * DFS系统的抽象FileSystem的实现。
+ * 该对象是终端用户代码与Hadoop DistributedFileSystem交互的方式。
  *
  *****************************************************************/
 @InterfaceAudience.LimitedPrivate({ "MapReduce", "HBase" })
@@ -145,7 +147,8 @@ public class DistributedFileSystem extends FileSystem {
     homeDirPrefix = conf.get(
         DFSConfigKeys.DFS_USER_HOME_DIR_PREFIX_KEY,
         DFSConfigKeys.DFS_USER_HOME_DIR_PREFIX_DEFAULT);
-    
+
+    // 构造文件系统客户端
     this.dfs = new DFSClient(uri, conf, statistics);
     this.uri = URI.create(uri.getScheme()+"://"+uri.getAuthority());
     this.workingDir = getHomeDirectory();

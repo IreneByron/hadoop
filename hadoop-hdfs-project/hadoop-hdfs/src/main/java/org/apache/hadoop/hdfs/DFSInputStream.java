@@ -87,6 +87,7 @@ import com.google.common.annotations.VisibleForTesting;
 /****************************************************************
  * DFSInputStream provides bytes from a named file.  It handles 
  * negotiation of the namenode and various datanodes as necessary.
+ * DFSInputStream提供命名文件的字节。它处理与NameNode和各个DataNodes的必要协商。
  ****************************************************************/
 @InterfaceAudience.Private
 public class DFSInputStream extends FSInputStream
