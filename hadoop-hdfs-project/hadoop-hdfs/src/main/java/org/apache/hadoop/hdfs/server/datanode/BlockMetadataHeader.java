@@ -42,6 +42,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 
 /**
+ * 存储和管理HDFS数据块元数据的组件。
  * BlockMetadataHeader manages metadata for data blocks on Datanodes.
  * This is not related to the Block related functionality in Namenode.
  * The biggest part of data block metadata is CRC for the block.

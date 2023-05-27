@@ -66,6 +66,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 
 /**
+ * DataNode中负责与NameNode通信的实体。
  * A thread per active or standby namenode to perform:
  * <ul>
  * <li> Pre-registration handshake with namenode</li>
@@ -415,6 +416,7 @@ class BPServiceActor implements Runnable {
   }
 
   /**
+   * 向NameNode发送的数据块报告（block report）
    * Report the list blocks to the Namenode
    * @return DatanodeCommands returned by the NN. May be null.
    * @throws IOException

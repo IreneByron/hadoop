@@ -66,6 +66,8 @@ import com.google.common.base.Preconditions;
  * The tool is deployed as an application program that can be run by the 
  * cluster administrator on a live HDFS cluster while applications
  * adding and deleting files.
+ * 平衡器是一种工具，用于在HDFS集群中某些数据节点变满或新的空节点加入集群时平衡磁盘空间使用情况。
+ * 该工具被部署为一个应用程序，可以在活动的HDFS集群上由集群管理员运行，同时应用程序可以添加和删除文件。
  * 
  * <p>SYNOPSIS
  * <pre>

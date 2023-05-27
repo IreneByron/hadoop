@@ -44,6 +44,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
+ * 块池（Block Pool）提供服务的实体
  * One instance per block-pool/namespace on the DN, which handles the
  * heartbeats to the active and standby NNs for that namespace.
  * This class manages an instance of {@link BPServiceActor} for each NN,

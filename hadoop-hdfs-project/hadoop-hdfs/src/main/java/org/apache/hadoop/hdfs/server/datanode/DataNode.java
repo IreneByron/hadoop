@@ -215,29 +215,44 @@ import com.google.protobuf.BlockingService;
  * have one or many DataNodes.  Each DataNode communicates
  * regularly with a single NameNode.  It also communicates
  * with client code and other DataNodes from time to time.
+ * DataNode是一个类（也是一个程序），用于存储DFS部署的一组数据块。
+ * 一个部署可以有一个或多个DataNode。
+ * 每个DataNode定期与单个NameNode进行通信。
+ * 它也会不时地与客户端代码和其他DataNode进行通信。
  *
  * DataNodes store a series of named blocks.  The DataNode
  * allows client code to read these blocks, or to write new
  * block data.  The DataNode may also, in response to instructions
  * from its NameNode, delete blocks or copy blocks to/from other
  * DataNodes.
+ * DataNodes存储一系列具有名称的数据块。
+ * DataNode允许客户端代码读取这些数据块或写入新的数据块。
+ * DataNode还可以根据来自NameNode的指令，删除数据块或将数据块从其他DataNode复制到自身或从自身复制到其他DataNode。
  *
  * The DataNode maintains just one critical table:
  *   block-> stream of bytes (of BLOCK_SIZE or less)
+ * DataNode维护着一个关键的表格：
+ *   数据块（block）-> 字节流（大小为BLOCK_SIZE或更小）
  *
  * This info is stored on a local disk.  The DataNode
  * reports the table's contents to the NameNode upon startup
  * and every so often afterwards.
+ * 这些信息存储在本地磁盘上。
+ * DataNode在启动时和之后的一段时间内定期向NameNode报告表格的内容。
  *
  * DataNodes spend their lives in an endless loop of asking
  * the NameNode for something to do.  A NameNode cannot connect
  * to a DataNode directly; a NameNode simply returns values from
  * functions invoked by a DataNode.
+ * DataNodes在一个无休止的循环中不断向NameNode请求任务。
+ * NameNode无法直接连接到DataNode；它只是通过返回 DataNode调用的函数的返回值 来与DataNode进行通信。
  *
  * DataNodes maintain an open server socket so that client code 
  * or other DataNodes can read/write data.  The host/port for
  * this server is reported to the NameNode, which then sends that
  * information to clients or other DataNodes that might be interested.
+ * DataNodes维护一个开放的服务器套接字open server socket，以便客户端代码或其他DataNodes可以读取/写入数据。
+ * 该服务器的主机/端口信息将报告给NameNode，然后由NameNode将该信息发送给可能感兴趣的客户端或其他DataNodes。
  *
  **********************************************************/
 @InterfaceAudience.Private

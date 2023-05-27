@@ -25,7 +25,7 @@ public interface Matcher {
   /** Given the cluster topology, does the left node match the right node? */
   public boolean match(NetworkTopology cluster, Node left,  Node right);
 
-  /** Match datanodes in the same node group. */
+  /** Match datanodes in the same node group. 将处于同一节点组的数据节点进行匹配。*/
   public static final Matcher SAME_NODE_GROUP = new Matcher() {
     @Override
     public boolean match(NetworkTopology cluster, Node left, Node right) {
@@ -38,7 +38,7 @@ public interface Matcher {
     }
   };
 
-  /** Match datanodes in the same rack. */
+  /** Match datanodes in the same rack. 将处于同一机架的数据节点进行匹配。*/
   public static final Matcher SAME_RACK = new Matcher() {
     @Override
     public boolean match(NetworkTopology cluster, Node left, Node right) {

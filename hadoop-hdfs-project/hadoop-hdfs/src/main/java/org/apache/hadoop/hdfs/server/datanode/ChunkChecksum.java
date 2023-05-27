@@ -19,6 +19,7 @@
 package org.apache.hadoop.hdfs.server.datanode;
 
 /**
+ * 用于校验数据块完整性的校验和算法。
  * holder class that holds checksum bytes and the length in a block at which
  * the checksum bytes end
  * 

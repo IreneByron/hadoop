@@ -40,6 +40,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
+ * 用于管理HDFS中的块池（Block Pool）的组件。
  * Manages the BPOfferService objects for the data node.
  * Creation, removal, starting, stopping, shutdown on BPOfferService
  * objects must be done via APIs in this class.

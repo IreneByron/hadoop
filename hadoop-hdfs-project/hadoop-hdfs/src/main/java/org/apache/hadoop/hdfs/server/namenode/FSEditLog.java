@@ -110,6 +110,7 @@ import com.google.common.collect.Lists;
 
 /**
  * FSEditLog maintains a log of the namespace modifications.
+ * FSEditLog维护着对命名空间修改的日志记录。
  * 
  */
 @InterfaceAudience.Private
@@ -120,6 +121,7 @@ public class FSEditLog implements LogsPurgeable {
 
   /**
    * State machine for edit log.
+   * 编辑日志的状态机。
    * 
    * In a non-HA setup:
    * 

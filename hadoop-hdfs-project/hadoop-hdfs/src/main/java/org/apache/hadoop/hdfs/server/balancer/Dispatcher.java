@@ -80,7 +80,7 @@ import org.apache.hadoop.util.Time;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
-/** Dispatching block replica moves between datanodes. */
+/** Dispatching block replica moves between datanodes. 在数据节点之间调度块副本的移动。 */
 @InterfaceAudience.Private
 public class Dispatcher {
   static final Log LOG = LogFactory.getLog(Dispatcher.class);
@@ -202,6 +202,7 @@ public class Dispatcher {
     /**
      * Choose a block & a proxy source for this pendingMove whose source &
      * target have already been chosen.
+     * 为此待移动的选择一ge代理源选择一个块
      * 
      * @return true if a block and its proxy are chosen; false otherwise
      */
@@ -219,7 +220,7 @@ public class Dispatcher {
     }
 
     /**
-     * @return true if the given block is good for the tentative move.
+     * @return true if the given block is good for the tentative move.如果给定的块对于临时移动是合适的，则返回true。
      */
     private boolean markMovedIfGoodBlock(DBlock block, StorageType targetStorageType) {
       synchronized (block) {
@@ -970,6 +971,10 @@ public class Dispatcher {
    * 1. the block is not in the process of being moved/has not been moved;
    * 2. the block does not have a replica on the target;
    * 3. doing the move does not reduce the number of racks that the block has
+   * 决定是否将块从源位置移动到目标位置是一个好的选择。一个块是一个好的选择如果：
+   * 1. 块不在移动过程中/未被移动；
+   * 2. 块在目标位置上没有副本；
+   * 3. 移动块不会减少块所在机架的数量。
    */
   private boolean isGoodBlockCandidate(StorageGroup source, StorageGroup target,
       StorageType targetStorageType, DBlock block) {
@@ -1009,6 +1014,7 @@ public class Dispatcher {
   /**
    * Determine whether moving the given block replica from source to target
    * would reduce the number of racks of the block replicas.
+   * 确定将给定的块副本从源位置移动到目标位置是否会减少块副本所在的机架数量。
    */
   private boolean reduceNumOfRacks(StorageGroup source, StorageGroup target,
       DBlock block) {
