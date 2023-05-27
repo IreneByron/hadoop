@@ -645,7 +645,7 @@ public class NetworkTopology {
     return dis+2;
   }
 
-  /** Check if two nodes are on the same rack
+  /** Check if two nodes are on the same rack  检查两个节点是否位于同一个机架上。
    * @param node1 one node (can be null)
    * @param node2 another node (can be null)
    * @return true if node1 and node2 are on the same rack; false otherwise
